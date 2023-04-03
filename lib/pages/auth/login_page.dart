@@ -148,7 +148,7 @@ class _LoginPageState extends State<LoginPage> {
         _isLoading = true;
       });
       await authService
-          .loginWithUserNameAndPassword(email, password)
+          .loginWithUserNameandPassword(email, password)
           .then((value) async {
         if (value == true) {
           if (value == true) {

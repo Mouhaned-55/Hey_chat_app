@@ -172,13 +172,13 @@ class _RegisterPageState extends State<RegisterPage> {
         _isLoading = true;
       });
       await authService
-          .registerUserWithEmailAndPassword(fullName, email, password)
+          .registerUserWithEmailandPassword(fullName, email, password)
           .then((value) async {
         if (value == true) {
           // saving the shared preference state
-          await HelperFuncitons.saveUserLoggedInStatus(true);
-          await HelperFuncitons.saveUserEmailSF(email);
-          await HelperFuncitons.saveUserNameSF(fullName);
+          await HelperFunctions.saveUserLoggedInStatus(true);
+          await HelperFunctions.saveUserEmailSF(email);
+          await HelperFunctions.saveUserNameSF(fullName);
           nextScreenReplace(context, const LoginPage());
           showSnackbar(context, Colors.green, "User Succrssfully Registered");
         } else {
