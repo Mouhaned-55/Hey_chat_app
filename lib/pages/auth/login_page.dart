@@ -1,16 +1,18 @@
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
-import 'package:flutter_chat_app/helper/helper_function.dart';
 import 'package:flutter_chat_app/pages/auth/register_page.dart';
-import 'package:flutter_chat_app/pages/home_page.dart';
 
+import '../../helper/helper_function.dart';
 import '../../services/auth_services.dart';
+import '../../services/database_services.dart';
 import '../../widgets/widgets.dart';
+import '../home_page.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -41,13 +43,12 @@ class _LoginPageState extends State<LoginPage> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
                         const Text(
-                          "Callemni",
+                          "Groupie",
                           style: TextStyle(
                               fontSize: 40, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 10),
-                        const Text(
-                            "Login now to see what they are talking about!",
+                        const Text("Login now to see what they are talking!",
                             style: TextStyle(
                                 fontSize: 15, fontWeight: FontWeight.w400)),
                         Image.asset("assets/login.png"),
@@ -142,7 +143,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void login() async {
+  login() async {
     if (formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
@@ -151,10 +152,14 @@ class _LoginPageState extends State<LoginPage> {
           .loginWithUserNameandPassword(email, password)
           .then((value) async {
         if (value == true) {
-          if (value == true) {
-            nextScreen(context, const HomePage());
-            showSnackbar(context, Colors.green, "You are Successfully Logged In");
-          }
+          QuerySnapshot snapshot =
+              await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
+                  .gettingUserData(email);
+          // saving the values to our shared preferences
+          await HelperFunctions.saveUserLoggedInStatus(true);
+          await HelperFunctions.saveUserEmailSF(email);
+          await HelperFunctions.saveUserNameSF(snapshot.docs[0]['fullName']);
+          nextScreenReplace(context, const HomePage());
         } else {
           showSnackbar(context, Colors.red, value);
           setState(() {

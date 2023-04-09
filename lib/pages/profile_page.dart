@@ -1,5 +1,5 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import '../services/auth_services.dart';
 import '../widgets/widgets.dart';
 import 'auth/login_page.dart';
@@ -8,7 +8,6 @@ import 'home_page.dart';
 class ProfilePage extends StatefulWidget {
   String userName;
   String email;
-
   ProfilePage({Key? key, required this.email, required this.userName})
       : super(key: key);
 
@@ -18,7 +17,6 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   AuthService authService = AuthService();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
