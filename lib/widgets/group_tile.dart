@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_app/widgets/widgets.dart';
 
+import '../pages/chat_page.dart';
+
 class GroupTile extends StatefulWidget {
   final String userName;
   final String groupId;
@@ -22,13 +24,13 @@ class _GroupTileState extends State<GroupTile> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // nextScreen(
-        //     context,
-            // ChatPage(
-            //   groupId: widget.groupId,
-            //   groupName: widget.groupName,
-            //   userName: widget.userName,
-            // ));
+         nextScreen(
+             context,
+             ChatPage(
+               groupId: widget.groupId,
+               groupName: widget.groupName,
+               userName: widget.userName,
+             ));
       },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
