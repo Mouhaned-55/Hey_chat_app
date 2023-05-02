@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_app/pages/profile_page.dart';
+import 'package:flutter_chat_app/pages/search_page.dart';
 
 import '../helper/helper_function.dart';
 import '../services/auth_services.dart';
@@ -68,7 +69,7 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
               onPressed: () {
-                //     nextScreen(context, const SearchPage());
+                     nextScreen(context, const SearchPage());
               },
               icon: const Icon(
                 Icons.search,

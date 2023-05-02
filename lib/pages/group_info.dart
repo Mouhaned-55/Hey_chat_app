@@ -2,16 +2,19 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_app/services/database_services.dart';
 
+import '../widgets/widgets.dart';
+import 'home_page.dart';
+
 class GroupInfo extends StatefulWidget {
   final String groupId;
   final String groupName;
   final String adminName;
-
   const GroupInfo(
-      {super.key,
-      required this.groupId,
+      {Key? key,
+      required this.adminName,
       required this.groupName,
-      required this.adminName});
+      required this.groupId})
+      : super(key: key);
 
   @override
   State<GroupInfo> createState() => _GroupInfoState();
@@ -19,7 +22,6 @@ class GroupInfo extends StatefulWidget {
 
 class _GroupInfoState extends State<GroupInfo> {
   Stream? members;
-
   @override
   void initState() {
     getMembers();
@@ -28,15 +30,15 @@ class _GroupInfoState extends State<GroupInfo> {
 
   getMembers() async {
     DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
-        .getMembers(widget.groupId)
-        .then((value) {
+        .getGroupMembers(widget.groupId)
+        .then((val) {
       setState(() {
-        members = value;
+        members = val;
       });
     });
   }
 
-  getName(String r) {
+  String getName(String r) {
     return r.substring(r.indexOf("_") + 1);
   }
 
@@ -47,29 +49,69 @@ class _GroupInfoState extends State<GroupInfo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          elevation: 0,
-          title: const Text("Group Info"),
-          backgroundColor: Theme.of(context).primaryColor,
-          actions: [
-            IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: const Icon(Icons.exit_to_app))
-          ],
-        ),
-        body: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-          child: Column(children: [
+      appBar: AppBar(
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: Theme.of(context).primaryColor,
+        title: const Text("Group Info"),
+        actions: [
+          IconButton(
+              onPressed: () {
+                showDialog(
+                    barrierDismissible: false,
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text("Exit"),
+                        content:
+                            const Text("Are you sure you exit the group? "),
+                        actions: [
+                          IconButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            icon: const Icon(
+                              Icons.cancel,
+                              color: Colors.red,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () async {
+                              DatabaseService(
+                                      uid: FirebaseAuth
+                                          .instance.currentUser!.uid)
+                                  .toggleGroupJoin(
+                                      widget.groupId,
+                                      getName(widget.adminName),
+                                      widget.groupName)
+                                  .whenComplete(() {
+                                nextScreenReplace(context, const HomePage());
+                              });
+                            },
+                            icon: const Icon(
+                              Icons.done,
+                              color: Colors.green,
+                            ),
+                          ),
+                        ],
+                      );
+                    });
+              },
+              icon: const Icon(Icons.exit_to_app))
+        ],
+      ),
+      body: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        child: Column(
+          children: [
             Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(30),
-                    color: Theme.of(context).primaryColor.withOpacity(0.2)),
-                child:
-                    Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30),
+                  color: Theme.of(context).primaryColor.withOpacity(0.2)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
                   CircleAvatar(
                     radius: 30,
                     backgroundColor: Theme.of(context).primaryColor,
@@ -79,10 +121,10 @@ class _GroupInfoState extends State<GroupInfo> {
                           fontWeight: FontWeight.w500, color: Colors.white),
                     ),
                   ),
-                    const SizedBox(
+                  const SizedBox(
                     width: 20,
                   ),
-                        Column(
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
@@ -91,18 +133,21 @@ class _GroupInfoState extends State<GroupInfo> {
                       ),
                       const SizedBox(
                         height: 5,
-                      ),  
+                      ),
                       Text("Admin: ${getName(widget.adminName)}")
                     ],
                   )
-                ])),
-               memberList(),
-          ]),
-        )
-        );
+                ],
+              ),
+            ),
+            memberList(),
+          ],
+        ),
+      ),
+    );
   }
 
-   memberList() {
+  memberList() {
     return StreamBuilder(
       stream: members,
       builder: (context, AsyncSnapshot snapshot) {
